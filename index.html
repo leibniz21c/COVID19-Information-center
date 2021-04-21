@@ -6,10 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <script src="mydateHandler.js"></script>
-    <script src="sir.js"></script>
+    <script src="util.js"></script>
     <script>
-        // SEIR object
+        // SIR object
         sir = new SIR();
 
         // Document ready
@@ -50,7 +49,7 @@
                         }
                     );
                     sir.evalDelta();
-                    sir.getMoreData(30);
+                    sir.getMoreData(100);
 
                     sir.writeMetadata();
                     sir.writeDocument();

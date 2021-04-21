@@ -20,12 +20,6 @@ function SIR() {
     */
     this.beta = 0.0253;
     this.gamma = 0.0670;
-    /*
-    Reference : https://m.health.chosun.com/svc/news_view.html?contid=2020062902672
-    In this article, the value of \a is 0.05 because duration of disease is 20 days.
-    (\a is inverse of duration.)
-    */
-    this.a = 0.05;
     // Just calculating with these dataset (average die probablity)
     this.diedProb = 0.0;
 
@@ -57,8 +51,6 @@ function SIR() {
     };
 
     this.getMoreData = function (date) {
-        import getDateStr from 'mydateHandler.js';
-
         var day = new Date();
         if (this.available) {
             for (var i = 0 ;i < date ;i ++) {
@@ -67,7 +59,7 @@ function SIR() {
                 // dRdt == derivates[2]
                 let derivates = this.dataset[this.dataset.length - 1]
                                     .getDerivates(this.beta, this.gamma, this.a);    
-                day.setDate(today.getDate() + 1);                            
+                day.setDate(day.getDate() + 1);                            
                 this.dataset.push(
                     new Data(
                         getDateStr(day),
@@ -82,7 +74,7 @@ function SIR() {
             return true;
         }
         return false;
-    }
+    };
 
     this.writeMetadata = function() {
         document.write("stateDt,susceptible,infected,recovered,died<br>");
@@ -91,7 +83,7 @@ function SIR() {
     this.writeDocument = function() {
         for (var i = 0; i < this.dataset.length; i++) {
             document.write(
-                this.dataset[i].stateDt + "," + this.dataset[i].susceptible + "," + this.dataset[i].infected + "," + this.dataset[i].recovered + "," + this.dataset[i].died + "," + "<br>");
+                this.dataset[i].stateDt + "," + this.dataset[i].susceptible + "," + this.dataset[i].infected + "," + this.dataset[i].recovered + "," + this.dataset[i].died + "<br>");
         }
     };
 
@@ -111,7 +103,7 @@ function Data(stateDt, died, infected, recovered, susceptible)
         this.susceptible = susceptible;
 
     // Processable data
-    this.deltaDies = 0;
+    this.deltaDied = 0;
 
     this.getDerivates = function (beta, gamma, a) {
         /*
@@ -127,4 +119,17 @@ function Data(stateDt, died, infected, recovered, susceptible)
 
         return [dSdt, dIdt, dRdt];
     };
+}
+
+
+function getDateStr(date) {
+    var year = date.getFullYear().toString();
+    var month = date.getMonth() + 1;
+    if (month < 10) month = '0' + month.toString();
+    else month = month.toString();
+    var day = date.getDate();
+    if (day < 10) day = '0' + day.toString();
+    else day = day.toString();
+
+    return year + month + day;
 }
