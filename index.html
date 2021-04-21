@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <script src="dataHandler.js"></script>
     <script src="mydateHandler.js"></script>
+    <script src="sir.js"></script>
+    <script>
+        // SEIR object
+        sir = new SIR();
 
-    <script type="text/javascript">
-        // Setting latest 100 day data
-        data = [];
+        // Document ready
         $(document).ready(function() {
+
             // Encrypted API KEY
             var encodedKey = "T0MlMkJxWiUyRmRibSUyRktROVphakU3SzU2JTJCVXJzRE9vdHFEUjU5bm1xR09MQzBBTWRVRkNtR2NiSlZqRUppeURYT0VjWlpYWUFlRk5JdHRIZSUyQkFPTFlQejJnJTNEJTNE";
             var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson'; /*URL*/
@@ -23,61 +25,42 @@
             beforeDay.setDate(beforeDay.getDate() - 101);
             var today = new Date();
             queryParams += '&' + encodeURIComponent('startCreateDt') 
-                + '=' + encodeURIComponent('20200601'); /*getDateStr(beforeDay)*/
+                + '=' + encodeURIComponent('20200301'); /*getDateStr(beforeDay)*/
             queryParams += '&' + encodeURIComponent('endCreateDt') 
-                + '=' + encodeURIComponent('20200701'); /*getDateStr(today)*/
+                + '=' + encodeURIComponent(getDateStr(today)); /*getDateStr(today)*/
             url = url + queryParams;
+
             $.ajax({
                 type: "GET",
                 url: url,
                 dataType: "xml",
                 success: function (xml) {
-                    $(xml).find("item").each( function() {
+                    $(xml).find("item").each(
+                        function() {
                             // Input data are reverse ordered.
-                                data.unshift(new Term(
+                            sir.appendData(
+                                new Data(
                                     Number($(this).find("stateDt").text()),
-                                    Number($(this).find("examCnt").text()),
                                     Number($(this).find("deathCnt").text()),
-                                    Number($(this).find("decideCnt").text()),
-                                    Number($(this).find("clearCnt").text())
+                                    Number($(this).find("decideCnt").text()) - Number($(this).find("clearCnt").text()) - Number($(this).find("deathCnt").text()),
+                                    Number($(this).find("clearCnt").text()),
+                                    0
                                 )
                             );
                         }
                     );
-                    var i;
-                    for (i = 1 ;i < data.length; i ++) 
-                        data[i].todayRecovered = data[i].recovered - data[i-1].recovered;
+                    sir.evalDelta();
+                    sir.getMoreData(30);
+
+                    sir.writeMetadata();
+                    sir.writeDocument();
                 }
             });
         });
-    </script>
-    <script>
-        function seir(data, beta, gamma, a) {
-            /*
-                return - rate of change of S, E, I, R by t
-                argument -
-                    beta : infection rate per day
-                    gamma : recovery rate per day
-                    a : average latency
-            */
-            var S = data.susceptible;
-            var E = data.exposed;
-            var I = data.infected;
-            var R = data.recovered;
-            dSdt = -beta*S*I;
-            dEdt = beta*S*I - a*E;
-            dIdt = a*E - gamma*I;
-            dRdt = gamma*I;
-            return [dSdt, dEdt, dIdt, dRdt];
-        }
 
-        function simulate(f,t0,y0,step,tmax) {
-           
-        }
-        // __CHECK_POINT__
     </script>
 
-    <title>SEIR model for latest COVID19 DATA in South Korea</title>
+    <title>SIR model for latest COVID19 DATA in South Korea</title>
 </head>
 <body>
 
