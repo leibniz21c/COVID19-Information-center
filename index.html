@@ -5,6 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- JQUERY -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
     <!-- Font style : Antonio -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet">
@@ -13,19 +16,65 @@
     <link type="text/css" rel="stylesheet" href="style.css"></link>
     <link type="text/css" rel="stylesheet" href="style-home.css"></link>
 
-    <title>Covid Information Center for South Korea</title>
+    <title>Covid Information Center : Republic Of Korea</title>
 </head>
 <body>
+    <!-- Desktop-chrome version -->
+    <!-- Header -->
     <header>
         <div class="header-menu">Overview</div>
         <div class="header-menu">SIR Prediction</div>
-        <img class="icon-image" src="icon.png">
+        <img class="icon-image" src="assets/img/icon.png">
         <div class="header-menu">COVID19 News</div>
         <div class="header-menu">Reference</div>
     </header>
 
+    <!-- Section -->
+    <section>
+        <!-- Welcome message -->
+        <div id="welcome-msg">
 
+        </div>
+        <!-- Welcome picture -->
+        <div id="welcome-pic">
+            <img src="assets/img/covid.png" width="100%">
+        </div>
+
+    </section>
     <script>
+        var welcomeMsg = $('#welcome-msg').offset().top;
+        var welcomePic = $('#welcome-pic').offset().top;
+
+        $(window).scroll(function () {
+            if ((welcomeMsg - $(window).scrollTop()) < 20) {
+                $('#welcome-msg').stop().fadeTo(100, 0);
+            } else {
+                $('#welcome-msg').stop().fadeTo('fast', 1);
+            }
+
+            if ((welcomePic - $(window).scrollTop()) < 20) {
+                $('#welcome-pic').stop().fadeTo(100, 0);
+            } else {
+                $('#welcome-pic').stop().fadeTo('fast', 1);
+            }
+        });
     </script>
+
+    <section>
+        <div id="box1"></div>
+        <div id="box2"></div>
+        <div id="box3"></div>
+        <div id="box4"></div>
+        <div id="box5"></div>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+
+    </footer>
+
+
 </body>
 </html>
