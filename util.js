@@ -171,6 +171,7 @@ function Data(stateDt, died, infected, recovered, susceptible)
 
 
 function getDateStr(date) {
+    // Date object to date string like "20200513".
     var year = date.getFullYear().toString();
     var month = date.getMonth() + 1;
     if (month < 10) month = '0' + month.toString();
