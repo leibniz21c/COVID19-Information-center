@@ -50,7 +50,7 @@ function SIR() {
         this.available = true;
     };
 
-    this.getMoreData = function (date) {
+    this.simulate = function (date) {
         var day = new Date();
         if (this.available) {
             for (var i = 0 ;i < date ;i ++) {
@@ -87,6 +87,45 @@ function SIR() {
         }
     };
 
+    // Getter for stateDt array
+    this.getLabels = function () {
+        var labels = [];
+    
+        this.dataset.forEach(function (item) {
+            labels.push(item.getLabel());
+        });
+        return labels;
+    };
+
+    // Getter for infected array
+    this.getInfected = function () {
+        var infected = [];
+
+        this.dataset.forEach(function (item) {
+            infected.push(item.infected);
+        });
+        return infected;
+    };
+
+    // Getter for susceptibles array
+    this.getSusceptibles = function () {
+        var susceptibles = [];
+
+        this.dataset.forEach(function (item) {
+            susceptibles.push(item.susceptible);
+        });
+        return susceptibles;
+    };
+    
+    // Getter for recovered array
+    this.getRecovered = function () {
+        var recovered = [];
+
+        this.dataset.forEach(function (item) {
+            recovered.push(item.recovered);
+        });
+        return recovered;
+    };
 
 }
 
@@ -118,6 +157,15 @@ function Data(stateDt, died, infected, recovered, susceptible)
         var dRdt = gamma*this.infected;
 
         return [dSdt, dIdt, dRdt];
+    };
+
+    this.getLabel = function() {
+        // stateDt ex : 20200305
+        // return : "2020.3.5"
+        var year = parseInt(this.stateDt/10000);
+        var month = parseInt(this.stateDt%10000/100);
+        var day = parseInt(this.stateDt%100);
+        return year + "." + month + "." + day;
     };
 }
 
