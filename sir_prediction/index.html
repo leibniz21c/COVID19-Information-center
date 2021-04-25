@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link type="text/css" rel="stylesheet" href="style.css"></link>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="util.js"></script>
+    <script>
+        var sir = new SIR();
+        var predictDate = 30;
+        var sirLabels = null;
+        var sirInfected = null;
+
+        // Document ready
+        $(document).ready(function() {
+            // 2021.04.26 : No more using API because CORS policy.
+            var url = 'covid_data_20210426.xml';
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "xml",
+                success: function (xml) {
+                    $(xml).find("item").each(
+                        function() {
+                            // Input data are reverse ordered.
+                            sir.appendData(
+                                new Data(
+                                    Number($(this).find("stateDt").text()),
+                                    Number($(this).find("deathCnt").text()),
+                                    Number($(this).find("decideCnt").text()) - Number($(this).find("clearCnt").text()) - Number($(this).find("deathCnt").text()),
+                                    Number($(this).find("clearCnt").text()),
+                                    0
+                                )
+                            );
+                        }
+                    );
+                    sir.evalDelta();
+
+                    // Chart
+                    var ctx = $("#line-chart");
+                    var lineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: sir.getLabels(), //["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+                            datasets: [
+                            {
+                                label: "Infected",
+                                data: sir.getInfected(), //[10,8,6,5,12,8,16,17,6,7,6,10]
+                                radius: 0,
+                                backgroundColor: "rgba(255,0,0)",
+                                borderColor: "rgb(255,0,0)",
+                                borderWidth: 2,
+                            },
+                            {
+                                label: "Recovered",
+                                data: sir.getRecovered(), //[10,8,6,5,12,8,16,17,6,7,6,10]
+                                radius: 0,
+                                backgroundColor: "rgba(0,0,255)",
+                                borderColor: "rgb(0,0,255)",
+                                borderWidth: 2,
+                            },
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            datasetFill : true,
+                        }
+                    });
+                }
+            });
+        }); // End of DOM ready
+    </script>
+
+
+    <title>SIR model for latest COVID19 DATA in South Korea</title>
+</head>
+<body>
+    <div class="header">
+        CIC
+    </div>
+
+    <div class="chart-container">
+        <canvas id="line-chart"></canvas>
+    </div>
+
+    <script>
+    </script>
+</body>
+</html>

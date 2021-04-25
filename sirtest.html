@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link type="text/css" rel="stylesheet" href="style.css"></link>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="plugin/ajax-cross-origin/js/jquery.ajax-cross-origin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="util.js"></script>
+    <script>
+        var sir = new SIR();
+        var predictDate = 30;
+        var sirLabels = null;
+        var sirInfected = null;
+        var data;
+        var callback;
+
+        // Document ready
+        $(document).ready(function() {
+            // Encrypted API KEY
+            var encodedKey = "T0MlMkJxWiUyRmRibSUyRktROVphakU3SzU2JTJCVXJzRE9vdHFEUjU5bm1xR09MQzBBTWRVRkNtR2NiSlZqRUppeURYT0VjWlpYWUFlRk5JdHRIZSUyQkFPTFlQejJnJTNEJTNE";
+            var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson'; /*URL*/
+            var queryParams = '?' + encodeURIComponent('ServiceKey') + '=' + atob(encodedKey); /*Service Key*/
+            queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+            queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+            var beforeDay = new Date();
+            beforeDay.setDate(beforeDay.getDate() - 101);
+            var today = new Date();
+            queryParams += '&' + encodeURIComponent('startCreateDt') 
+                + '=' + encodeURIComponent('20200301'); /*getDateStr(beforeDay)*/
+            queryParams += '&' + encodeURIComponent('endCreateDt') 
+                + '=' + encodeURIComponent(getDateStr(today)); /*getDateStr(today)*/
+            url = url + queryParams;
+
+            $.getJSON(url + "?callback=?", data, callback);
+        }); // End of DOM ready
+    </script>
+
+
+    <title>SIR model for latest COVID19 DATA in South Korea</title>
+</head>
+<body>
+    <div class="header">
+        CIC
+    </div>
+
+    <div class="chart-container">
+        <canvas id="line-chart"></canvas>
+    </div>
+
+    <script>
+    </script>
+</body>
+</html>
