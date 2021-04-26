@@ -5,20 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link type="text/css" rel="stylesheet" href="style.css"></link>
+    <!-- Font style : Antonio -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link type="text/css" rel="stylesheet" href="../style.css"></link>
+    <link type="text/css" rel="stylesheet" href="style-sir_prediction.css"></link>
+
+    <!-- js -->
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="util.js"></script>
+
+    <script src="../../js/util.js"></script>
+    <script src="../../data/covid/latest_file.js"></script>
+
     <script>
         var sir = new SIR();
-        var predictDate = 30;
-        var sirLabels = null;
-        var sirInfected = null;
 
         // Document ready
         $(document).ready(function() {
             // 2021.04.26 : No more using API because CORS policy.
-            var url = 'covid_data_20210426.xml';
+            let url = getCovidUrlInOverview();
 
             $.ajax({
                 type: "GET",
@@ -41,54 +49,75 @@
                     );
                     sir.evalDelta();
 
-                    // Chart
-                    var ctx = $("#line-chart");
-                    var lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: sir.getLabels(), //["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-                            datasets: [
-                            {
-                                label: "Infected",
-                                data: sir.getInfected(), //[10,8,6,5,12,8,16,17,6,7,6,10]
-                                radius: 0,
-                                backgroundColor: "rgba(255,0,0)",
-                                borderColor: "rgb(255,0,0)",
-                                borderWidth: 2,
-                            },
-                            {
-                                label: "Recovered",
-                                data: sir.getRecovered(), //[10,8,6,5,12,8,16,17,6,7,6,10]
-                                radius: 0,
-                                backgroundColor: "rgba(0,0,255)",
-                                borderColor: "rgb(0,0,255)",
-                                borderWidth: 2,
-                            },
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            datasetFill : true,
-                        }
-                    });
-                }
-            });
+                    // Simulating with SIR model
+                    sir.simulate(100);
+
+                }, // end of success function
+            }); // end of ajax
         }); // End of DOM ready
     </script>
 
 
-    <title>SIR model for latest COVID19 DATA in South Korea</title>
+    <title>Covid Information Center : Republic Of Korea</title>
 </head>
 <body>
-    <div class="header">
-        CIC
+    
+    <!-- Desktop-chrome version -->
+    <!-- Header -->
+    <header>
+        <div 
+            class="header-menu"
+            onclick="location.href='../overview/index.html';">
+            Overview
+        </div>
+        <div 
+            id="header-menu_sir_prediction"
+            class="header-menu"
+            onclick="location.href='./index.html';">
+            SIR Prediction
+        </div>
+        <img 
+            class="icon-image"
+            src="../assets/imges/icon.png"
+            onclick="location.href='../index.html';">
+        <div
+            class="header-menu"
+            onclick="location.href='../news/index.html';">
+            COVID19 News
+        </div>
+        <div
+            class="header-menu"
+            onclick="location.href='../reference/index.html';">
+            Reference
+        </div>
+    </header>
+
+
+    <!-- Input range div -->
+    <div id="div_datebar_title">
+        <p id="p_datebar_title">How many days do you want to predict?</p>
+    </div>
+    <div id="div_datebar">
+        <form oninput="out.value=parseInt(date.value) + 'days'" action="" method="get" style="position: relative;">
+            <input type="range" name="date" min="0" max="100" value="0" id="input_date_range" step="1"> 
+            <output name="out" for="input_date_range" style="display: inline; color: white;" id="output_date_range"></output>
+            <input type="submit" value="Submit" name="date_submit" id="input_date_submit">
+        </form>
     </div>
 
-    <div class="chart-container">
-        <canvas id="line-chart"></canvas>
-    </div>
 
-    <script>
-    </script>
+    <!-- Show div -->
+    <section class="section_after_predict">
+        
+    </section>
+
+
+
+    <!-- Footer -->
+    <footer>
+
+    </footer>
+
+
 </body>
 </html>
