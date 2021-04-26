@@ -40,8 +40,9 @@ function SIR() {
             return -1;
         });
 
-        // Calculating Died Probability
+        // Calculating Died Probability and delta values
         for (var i = 1; i < this.dataset.length; i++) {
+            this.dataset[i].deltaRecovered = this.dataset[i].recovered - this.dataset[i - 1].recovered;
             this.dataset[i].deltaDied = this.dataset[i].died - this.dataset[i - 1].died;
             sumOfDiedProbability += this.dataset[i].deltaDied / this.dataset[i - 1].infected;
         }
@@ -74,17 +75,6 @@ function SIR() {
             return true;
         }
         return false;
-    };
-
-    this.writeMetadata = function() {
-        document.write("stateDt,susceptible,infected,recovered,died<br>");
-    };
-
-    this.writeDocument = function() {
-        for (var i = 0; i < this.dataset.length; i++) {
-            document.write(
-                this.dataset[i].stateDt + "," + this.dataset[i].susceptible + "," + this.dataset[i].infected + "," + this.dataset[i].recovered + "," + this.dataset[i].died + "<br>");
-        }
     };
 
     // Getter for stateDt array
@@ -127,6 +117,36 @@ function SIR() {
         return recovered;
     };
 
+    // Getter for recovered array
+    this.getDeltaRecovered = function () {
+        var deltaRecovered = [];
+
+        this.dataset.forEach(function (item) {
+            deltaRecovered.push(item.deltaRecovered);
+        });
+        return deltaRecovered;
+    };
+
+    // Getter for died array
+    this.getDied = function () {
+        var died = [];
+
+        this.dataset.forEach(function (item) {
+            died.push(item.died);
+        });
+        return died;
+    };
+
+    // Getter for delta died array
+    this.getDeltaDied = function () {
+        var deltaDied = [];
+
+        this.dataset.forEach(function (item) {
+            deltaDied.push(item.deltaDied);
+        });
+        return deltaDied;
+    };
+
 }
 
 function Data(stateDt, died, infected, recovered, susceptible)
@@ -143,6 +163,7 @@ function Data(stateDt, died, infected, recovered, susceptible)
 
     // Processable data
     this.deltaDied = 0;
+    this.deltaRecovered = 0;
 
     this.getDerivates = function (beta, gamma, a) {
         /*
@@ -159,7 +180,7 @@ function Data(stateDt, died, infected, recovered, susceptible)
         return [dSdt, dIdt, dRdt];
     };
 
-    this.getLabel = function() {
+    this.getLabel = function () {
         // stateDt ex : 20200305
         // return : "2020.3.5"
         var year = parseInt(this.stateDt/10000);
@@ -181,4 +202,8 @@ function getDateStr(date) {
     else day = day.toString();
 
     return year + month + day;
+}
+
+function parseBigDecimal (decimal) {
+    return parseInt(decimal);
 }
