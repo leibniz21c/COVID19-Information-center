@@ -26,7 +26,7 @@
         // Document ready
         $(document).ready(function() {
             // 2021.04.26 : No more using API because CORS policy.
-            var url = getCovidUrlInOverview();
+            let url = getCovidUrlInOverview();
 
             $.ajax({
                 type: "GET",
@@ -47,9 +47,7 @@
                             );
                         }
                     );
-
                     sir.evalDelta();
-
 
                     // Overall Chart
                     var ctx = $("#overall_line-chart");
@@ -114,7 +112,7 @@
                             datasets: [
                                 {
                                     label: "Recovered",
-                                    data: sir.getRecovered(),
+                                    data: sir.getDeltaRecovered(),
                                     radius: 0,
                                     backgroundColor: "rgba(0,0,255)",
                                     borderColor: "rgb(0,0,255)",
@@ -128,16 +126,103 @@
                         }
                     });
 
-                    
+                    // Died Chart
+                    var ctx = $("#died_line-chart");
+                    var lineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: sir.getLabels(),
+                            datasets: [
+                                {
+                                    label: "Died",
+                                    data: sir.getDeltaDied(),
+                                    radius: 0,
+                                    backgroundColor: "rgba(255,255,255)",
+                                    borderColor: "rgb(255,255,255)",
+                                    borderWidth: 2,
+                                },
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            datasetFill : true,
+                        }
+                    });
 
-                }
-            });
+                    //
+                    // Contents setting : 
+
+                    // Updated label
+                    $("#p_updated_info")
+                    .text("Updated : " + sir.dataset[sir.dataset.length - 1].getLabel());
+
+                    // boxes contents
+                    $("#p_content_infected_total")
+                    .text(parseBigDecimal(sir.dataset[sir.dataset.length - 1].infected));
+
+                    if (sir.dataset[sir.dataset.length - 1].infected - sir.dataset[sir.dataset.length - 2].infected > 0) {
+                        // Positive number of diff infected
+                        $("#p_content_infected_diff")
+                        .text("▲ " + parseBigDecimal(sir.dataset[sir.dataset.length - 1].infected - sir.dataset[sir.dataset.length - 2].infected))
+                        .css({
+                            "color": "red"
+                        });
+                    } else if (sir.dataset[sir.dataset.length - 1].infected - sir.dataset[sir.dataset.length - 2].infected < 0) {
+                        // Negative number of diff infected
+                        $("#p_content_infected_diff")
+                        .text("▲ " + parseBigDecimal(sir.dataset[sir.dataset.length - 1].infected - sir.dataset[sir.dataset.length - 2].infected))
+                        .css({
+                            "color": "blue"
+                        });
+                    } else {
+                        // 0 number of diff infected
+                        $("#p_content_infected_diff")
+                        .text(parseBigDecimal(sir.dataset[sir.dataset.length - 1].infected - sir.dataset[sir.dataset.length - 2].infected))
+                    }
+
+                    $("#p_content_recovered_total")
+                    .text(parseBigDecimal(sir.dataset[sir.dataset.length - 1].recovered));
+
+                    if (sir.dataset[sir.dataset.length - 1].recovered - sir.dataset[sir.dataset.length - 2].recovered > 0) {
+                        // Positive number of diff infected
+                        $("#p_content_recovered_diff")
+                        .text("▲ " + parseBigDecimal(sir.dataset[sir.dataset.length - 1].recovered - sir.dataset[sir.dataset.length - 2].recovered))
+                        .css({
+                            "color": "red"
+                        });
+                    } else {
+                        // There are only two case at the recovered field.
+                        $("#p_content_infected_diff")
+                        .text(parseBigDecimal(sir.dataset[sir.dataset.length - 1].recovered - sir.dataset[sir.dataset.length - 2].recovered))
+                    }
+
+                    $("#p_content_died_total")
+                    .text(parseBigDecimal(sir.dataset[sir.dataset.length - 1].died));
+
+                    if (sir.dataset[sir.dataset.length - 1].deltaDied > 0) {
+                        // Positive number of diff infected
+                        $("#p_content_died_diff")
+                        .text("▲ " + parseBigDecimal(sir.dataset[sir.dataset.length - 1].deltaDied))
+                        .css({
+                            "color": "red"
+                        });
+                    } else {
+                        // There are only two case at the died field.
+                        $("#p_content_died_diff")
+                        .text(parseBigDecimal(sir.dataset[sir.dataset.length - 1].deltaDied));
+                    }
+
+
+                }, // end of success function
+            }); // end of ajax
         }); // End of DOM ready
     </script>
+
 
     <title>Covid Information Center : Republic Of Korea</title>
 </head>
 <body>
+    
     <!-- Desktop-chrome version -->
     <!-- Header -->
     <header>
@@ -168,22 +253,87 @@
         </div>
     </header>
 
+
+    <!-- Updated date -->
+    <section
+        id="section_updated_info">
+        <div id="div_updated_info">
+            <p 
+                id="p_updated_info"
+                style="
+                    font-family: Antonio;
+                    font-size: 8;
+                    color: white;">
+                    Updated : 
+            </p>
+        </div>
+    </section>
+
+
+    <!-- Contents -->
+    <section
+        id="section_contents">
+        <p
+            style="
+                position: absolute;
+                left: 4%;
+                font-family: Antonio;
+                font-size: 8;
+                color: white;">
+                Today 
+        </p>
+
+        <div
+            class="content"
+            id="div_content_infected">
+            <p class="content_name">Infected</p>
+            <p id="p_content_infected_total" class="p_content_total">0</p>
+            <p id="p_content_infected_diff" class="p_content_diff">0</p>
+
+        </div>
+        <div
+            class="content"
+            id="div_content_recovered">
+            <p class="content_name">Total Recovered</p>
+            <p id="p_content_recovered_total" class="p_content_total">0</p>
+            <p id="p_content_recovered_diff" class="p_content_diff">0</p>
+
+        </div>
+        <div
+            class="content"
+            id="div_content_died">
+        <p class="content_name">Total Died</p>
+        <p id="p_content_died_total" class="p_content_total">0</p>
+        <p id="p_content_died_diff" class="p_content_diff">0</p>
+
+    </div>
+    </section>
+
     
     <!-- Section -->
     <section>
         <div
             class="chart-container">
+            <p class="content_name">Overall Graph</p>
             <canvas id="overall_line-chart"></canvas>
         </div>
 
         <div
             class="chart-container">
+            <p class="content_name">Infected Graph</p>
             <canvas id="infected_line-chart"></canvas>
         </div>
 
         <div
             class="chart-container">
+            <p class="content_name">Recovered Graph</p>
             <canvas id="recovered_line-chart"></canvas>
+        </div>
+
+        <div
+            class="chart-container">
+            <p class="content_name">Died Graph</p>
+            <canvas id="died_line-chart"></canvas>
         </div>
     </section>
     
