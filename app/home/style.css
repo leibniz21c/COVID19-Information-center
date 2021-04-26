@@ -10,12 +10,21 @@ header {
     background-color: rgb(25, 25, 25);
     height: 50px;
     width: 100%;
+
+    z-index: 0;
 }
+
+/* header : Icon */
 .icon-image {
     width: 50px;
     height: 50px;
     border-radius: 10px;
 }
+.icon-image {
+    cursor: pointer;
+}
+
+/* header : menu */
 .header-menu {
     flex: 1;
     position: relative;
@@ -27,5 +36,7 @@ header {
     transition: 0.5s;
 }
 .header-menu:hover {
-    text-decoration:underline; color:#888888
+    text-decoration:underline;
+    color:#888888;
+    cursor: pointer;
 }

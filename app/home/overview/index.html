@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font style : Antonio -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link type="text/css" rel="stylesheet" href="../style.css"></link>
+    <link type="text/css" rel="stylesheet" href="style-overview.css"></link>
+
+    <!-- js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="../../js/util.js"></script>
+    <script src="../../data/covid/latest_file.js"></script>
+
+    <script>
+        var sir = new SIR();
+
+        // Document ready
+        $(document).ready(function() {
+            // 2021.04.26 : No more using API because CORS policy.
+            var url = getCovidUrlInOverview();
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "xml",
+                success: function (xml) {
+                    $(xml).find("item").each(
+                        function() {
+                            // Input data are reverse ordered.
+                            sir.appendData(
+                                new Data(
+                                    Number($(this).find("stateDt").text()),
+                                    Number($(this).find("deathCnt").text()),
+                                    Number($(this).find("decideCnt").text()) - Number($(this).find("clearCnt").text()) - Number($(this).find("deathCnt").text()),
+                                    Number($(this).find("clearCnt").text()),
+                                    0
+                                )
+                            );
+                        }
+                    );
+
+                    sir.evalDelta();
+
+
+                    // Overall Chart
+                    var ctx = $("#overall_line-chart");
+                    var lineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: sir.getLabels(),
+                            datasets: [
+                                {
+                                    label: "Infected",
+                                    data: sir.getInfected(),
+                                    radius: 0,
+                                    backgroundColor: "rgba(255,0,0)",
+                                    borderColor: "rgb(255,0,0)",
+                                    borderWidth: 2,
+                                },
+                                {
+                                    label: "Recovered",
+                                    data: sir.getRecovered(),
+                                    radius: 0,
+                                    backgroundColor: "rgba(0,0,255)",
+                                    borderColor: "rgb(0,0,255)",
+                                    borderWidth: 2,
+                                },
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            datasetFill : true,
+                        }
+                    });
+
+                    // Infected Chart
+                    var ctx = $("#infected_line-chart");
+                    var lineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: sir.getLabels(),
+                            datasets: [
+                                {
+                                    label: "Infected",
+                                    data: sir.getInfected(),
+                                    radius: 0,
+                                    backgroundColor: "rgba(255,0,0)",
+                                    borderColor: "rgb(255,0,0)",
+                                    borderWidth: 2,
+                                },
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            datasetFill : true,
+                        }
+                    });
+
+                    // Recovered Chart
+                    var ctx = $("#recovered_line-chart");
+                    var lineChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: sir.getLabels(),
+                            datasets: [
+                                {
+                                    label: "Recovered",
+                                    data: sir.getRecovered(),
+                                    radius: 0,
+                                    backgroundColor: "rgba(0,0,255)",
+                                    borderColor: "rgb(0,0,255)",
+                                    borderWidth: 2,
+                                },
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            datasetFill : true,
+                        }
+                    });
+
+                    
+
+                }
+            });
+        }); // End of DOM ready
+    </script>
+
+    <title>Covid Information Center : Republic Of Korea</title>
+</head>
+<body>
+    <!-- Desktop-chrome version -->
+    <!-- Header -->
+    <header>
+        <div 
+            id="header-menu_overview"
+            class="header-menu"
+            onclick="location.href='./index.html';">
+            Overview
+        </div>
+        <div 
+            class="header-menu"
+            onclick="location.href='../sir_prediction/index.html';">
+            SIR Prediction
+        </div>
+        <img 
+            class="icon-image"
+            src="../assets/imges/icon.png"
+            onclick="location.href='../index.html';">
+        <div
+            class="header-menu"
+            onclick="location.href='../news/index.html';">
+            COVID19 News
+        </div>
+        <div
+            class="header-menu"
+            onclick="location.href='../reference/index.html';">
+            Reference
+        </div>
+    </header>
+
+    
+    <!-- Section -->
+    <section>
+        <div
+            class="chart-container">
+            <canvas id="overall_line-chart"></canvas>
+        </div>
+
+        <div
+            class="chart-container">
+            <canvas id="infected_line-chart"></canvas>
+        </div>
+
+        <div
+            class="chart-container">
+            <canvas id="recovered_line-chart"></canvas>
+        </div>
+    </section>
+    
+
+    <!-- Footer -->
+    <footer>
+
+    </footer>
+
+
+</body>
+</html>
