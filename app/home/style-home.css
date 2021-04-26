@@ -1,23 +1,43 @@
 #welcome-msg {
     position: absolute;
     left: 5%;
-    top: 15%;
+    top: 7%;
 
-    width: 40%;
+    width: 50%;
     height: 80%;
 
-    border: 1px solid white;
+    border: 1px solid black;
+}
+#p_welcome_msg_title {
+    font-family: Antonio;
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: white;
+}
+#p_welcome_msg {
+    font-family: Antonio;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: white;
+}
+li {
+    font-family: arial;
+    color: white;
+}
+p {
+    font-family: arial;
+    color: white;
 }
 
 #welcome-pic {
     position: absolute;
     right: 5%;
-    top: 15%;
+    top: 7%;
 
     width: 40%;
     height: 80%;
 
-    border: 1px solid white;
+    border: 1px solid black;
 }
 
 #box1 {
