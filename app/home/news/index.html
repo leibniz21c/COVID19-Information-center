@@ -8,10 +8,16 @@
     <!-- Font style : Antonio -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/earlyaccess/jejugothic.css" rel="stylesheet">
 
     <!-- CSS -->
     <link type="text/css" rel="stylesheet" href="../style.css"></link>
     <link type="text/css" rel="stylesheet" href="style-news.css"></link>
+
+    <!-- js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="../../js/util.js"></script>
+    <script src="../../data/news/latest_file.js"></script>
 
     <title>Covid Information Center : Republic Of Korea</title>
 </head>
@@ -47,10 +53,63 @@
     </header>
 
     
-    <!-- Section -->
-    <section>
+    <!-- Updated date -->
+    <section
+        id="section_updated_info">
+        <div id="div_updated_info">
+            <p 
+                id="p_updated_info"
+                style="
+                    font-family: Antonio;
+                    font-size: 8;
+                    color: white;">
+                    Updated : 
+            </p>
+        </div>
+    </section>
+
+
+    <section id="news">
 
     </section>
+
+    <script>
+        let url = getNewsUrlInNews();
+        $.ajax({
+            url: url,
+            dataType: "json",
+            success: function (data) {
+                news = data;
+                $("#p_updated_info").text("Updated : " + news[0].date + "." + news[0].time);
+
+                let newsSection = $("#news");
+                for (var i = 0 ;i < news.length; i++) {
+                    let image = $("<img>")
+                        .attr("src", news[i].imageUrl)
+                        .addClass("image_news_component");
+                    let title = $("<p>")
+                        .text(news[i].title)
+                        .addClass("title_news_component");
+                    let content = $("<p>")
+                        .text(news[i].content + "…")
+                        .addClass("content_news_component");
+                    let dateTime = $("<p>")
+                        .text(news[i].date + "." + news[i].time)
+                        .addClass("datetime_news_component");
+
+                    let newsDiv = $("<div>")
+                        .addClass("div_news_component")
+                        .attr("OnClick", "location.href=" + "'" + news[i].url + "'");
+                    newsDiv
+                    .append(image)
+                    .append(title)
+                    .append(content)
+                    .append(dateTime);
+                    newsSection.append(newsDiv);
+                }
+            }
+        }); // End of ajax
+    </script>
     
 
     <!-- Footer -->
