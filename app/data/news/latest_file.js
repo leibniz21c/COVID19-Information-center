@@ -3,17 +3,8 @@
 // you just have to modify this file. 
 
 // Modify this part.
-var fileName = 'news_data_20210426.json';
+var fileName = 'news_data_20210429.json';
 
-// Don't modify these parts.
-function getNewsUrlInHome() {
-    return '../data/news/' + fileName;
-}
-
-function getNewsUrlInOverview() {
-    return '../../data/news/' + fileName;
-}
-
-function getNewsUrlInSIR_prediction() {
+function getNewsUrlInNews() {
     return '../../data/news/' + fileName;
 }
