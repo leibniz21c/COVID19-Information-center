@@ -1,4 +1,4 @@
-# Advanced-Web-Programming-Midterm-Assignment
+# COVID19 Information center
 <right>2017111066 Heesung Yang</right>
 
 This is a repository for 2021 KNU Advanced Web Programming Midterm Assignment. It is just __static web__  by github web hosting. Sorry about newly data update. Not updating as of April 29th. <br>
