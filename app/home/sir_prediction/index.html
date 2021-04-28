@@ -21,152 +21,10 @@
     <script src="../../data/covid/latest_file.js"></script>
 
     <script>
-        var sir = new SIR();
-
-        // Document ready
-        $(document).ready(function() {
-            // 2021.04.26 : No more using API because CORS policy.
-            let url = getCovidUrlInOverview();
-
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "xml",
-                success: function (xml) {
-                    $(xml).find("item").each(
-                        function() {
-                            // Input data are reverse ordered.
-                            sir.appendData(
-                                new Data(
-                                    Number($(this).find("stateDt").text()),
-                                    Number($(this).find("deathCnt").text()),
-                                    Number($(this).find("decideCnt").text()) - Number($(this).find("clearCnt").text()) - Number($(this).find("deathCnt").text()),
-                                    Number($(this).find("clearCnt").text()),
-                                    0
-                                )
-                            );
-                        }
-                    );
-                    sir.evalDelta();
-
-                    // Overall Chart
-                    var ctx = $("#overall_line-chart");
-                    var lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: sir.getLabels(),
-                            datasets: [
-                                {
-                                    label: "Infected",
-                                    data: sir.getInfected(),
-                                    radius: 0,
-                                    backgroundColor: "rgba(255,0,0)",
-                                    borderColor: "rgb(255,0,0)",
-                                    borderWidth: 2,
-                                },
-                                {
-                                    label: "Recovered",
-                                    data: sir.getRecovered(),
-                                    radius: 0,
-                                    backgroundColor: "rgba(0,0,255)",
-                                    borderColor: "rgb(0,0,255)",
-                                    borderWidth: 2,
-                                },
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            datasetFill : true,
-                        }
-                    });
-
-
-                    // Infected Chart
-                    var ctx = $("#infected_line-chart");
-                    var lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: sir.getLabels(),
-                            datasets: [
-                                {
-                                    label: "Infected",
-                                    data: sir.getInfected(),
-                                    radius: 0,
-                                    backgroundColor: "rgba(255,0,0)",
-                                    borderColor: "rgb(255,0,0)",
-                                    borderWidth: 2,
-                                },
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            datasetFill : true,
-                        }
-                    });
-
-                    // Recovered Chart
-                    var ctx = $("#recovered_line-chart");
-                    var lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: sir.getLabels(),
-                            datasets: [
-                                {
-                                    label: "Recovered",
-                                    data: sir.getDeltaRecovered(),
-                                    radius: 0,
-                                    backgroundColor: "rgba(0,0,255)",
-                                    borderColor: "rgb(0,0,255)",
-                                    borderWidth: 2,
-                                },
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            datasetFill : true,
-                        }
-                    });
-
-                    // Died Chart
-                    var ctx = $("#died_line-chart");
-                    var lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: sir.getLabels(),
-                            datasets: [
-                                {
-                                    label: "Died",
-                                    data: sir.getDeltaDied(),
-                                    radius: 0,
-                                    backgroundColor: "rgba(255,255,255)",
-                                    borderColor: "rgb(255,255,255)",
-                                    borderWidth: 2,
-                                },
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            datasetFill : true,
-                        }
-                    });
-
-                    $("#p_sir_info")
-                    .text(
-                        "after 0 days, " 
-                        + parseInt(sir.dataset[sir.dataset.length - 1].infected)
-                        + " infected , "
-                        + parseInt(sir.dataset[sir.dataset.length - 1].recovered)
-                        + " total recovered, and "
-                        + parseInt(sir.dataset[sir.dataset.length - 1].died)
-                        + " deaths are predicted.");
-
-                }, // end of success function
-            }); // end of ajax
-        }); // End of DOM ready
-
         function sir_submit() {
             var sir_predicted = new SIR();
             var date = get_query().date;
+            if (!date) date = 0;
             let url = getCovidUrlInOverview();
 
             $.ajax({
@@ -257,7 +115,7 @@
                             datasets: [
                                 {
                                     label: "Recovered",
-                                    data: sir_predicted.getDeltaRecovered(),
+                                    data: sir_predicted.getRecovered(),
                                     radius: 0,
                                     backgroundColor: "rgba(0,0,255)",
                                     borderColor: "rgb(0,0,255)",
@@ -271,43 +129,25 @@
                         }
                     });
 
-                    // Died Chart
-                    var ctx = $("#died_line-chart");
-                    var lineChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: sir_predicted.getLabels(),
-                            datasets: [
-                                {
-                                    label: "Died",
-                                    data: sir_predicted.getDeltaDied(),
-                                    radius: 0,
-                                    backgroundColor: "rgba(255,255,255)",
-                                    borderColor: "rgb(255,255,255)",
-                                    borderWidth: 2,
-                                },
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            datasetFill : true,
-                        }
-                    });
-
                     $("#p_sir_info")
                     .text(
-                        "after 0 days, " 
+                        "after " + parseInt(date) + " days, " 
                         + parseInt(sir_predicted.dataset[sir_predicted.dataset.length - 1].infected)
-                        + " infected , "
+                        + " infected and "
                         + parseInt(sir_predicted.dataset[sir_predicted.dataset.length - 1].recovered)
-                        + " total recovered, and "
-                        + parseInt(sir_predicted.dataset[sir_predicted.dataset.length - 1].died)
-                        + " deaths are predicted.");
-
+                        + " total recovered.");
                 }, // end of success function
             }); // end of ajax
-        }
+            }
     </script>
+
+    <script>
+        // Document ready
+        $(document).ready(function() {
+            sir_submit();
+        }); // End of DOM ready
+    </script>
+
 
 
     <title>Covid Information Center : Republic Of Korea</title>
@@ -349,38 +189,19 @@
     <div id="div_datebar_title">
         <p id="p_datebar_title">How many days do you want to predict?</p>
     </div>
+    
+
     <div id="div_datebar">
-        <form 
-            oninput="out.value=parseInt(date.value) + 'days'"
-            action=""
-            method="get"
-            style="
-                position: relative;
-                ">
-            <input 
-                type="range" 
-                name="date"
-                min="0" max="100"
-                value="0" step="1"
-                id="input_date_range">
-            <output
-                name="out"
-                for="input_date_range"
-                value="0days"
-                style="
-                    display: inline;
-                    color: white;"
-                id="output_date_range">
+        <form oninput="out.value=parseInt(date.value)+'days'" method="get" style="position: relative;">
+            <input type="range" name="date" min="0" max="100" value="0" step="1" id="input_date_range">
+            <output name="out" for="input_date_range" style="display: inline; color: white;" id="output_date_range">
                 0days
             </output>
-            <input
-                type="submit"
-                value="Submit"
-                name="date_submit"
-                id="input_date_submit"
-                onclick="sir_submit()">
+            <input type="submit" value="Submit" name="date_submit" id="input_date_submit">
         </form>
     </div>
+    <!-- onclick="sir_submit()" -->
+
 
 
     <!-- Show div -->
@@ -408,16 +229,9 @@
 
     <div
         class="chart-container">
-        <p class="content_name">Recovered Graph with SIR model</p>
+        <p class="content_name">Total Recovered Graph with SIR model</p>
         <canvas id="recovered_line-chart"></canvas>
     </div>
-
-    <div
-        class="chart-container">
-        <p class="content_name">Died Graph with SIR model</p>
-        <canvas id="died_line-chart"></canvas>
-    </div>
-
     <!-- Footer -->
     <footer>
 
