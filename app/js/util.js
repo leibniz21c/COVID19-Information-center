@@ -217,3 +217,12 @@ function get_query(){
     }
     return result;
 }
+
+function News(date, time, title, content, imageUrl, url) {
+    this.date = date;
+    this.time = time;
+    this.title = title;
+    this.content = content;
+    this.imageUrl = imageUrl;
+    this.url = url;
+}
